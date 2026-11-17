@@ -20,6 +20,10 @@
 % Corredor INDIVISÍVEL (o dataset não dá a posição do produto): corredor com item = aresta obrigatória.
 % Rota mínima = problema do Carteiro Rural (ligação com Euler).
 % Custo da simplificação: superestima a distância quando o item está perto da entrada (vai para limitações).
+% [Resultado central] Proposição: com corredor inteiro, um bloco e caixa na travessa da frente, o S-shape é ótimo.
+% Prova: nº de travessias de corredor é par (começa e termina na frente) e >= m -> >= m arredondado p/ cima até par;
+% nas travessas é preciso ir do caixa ao corredor obrigatório mais distante e voltar; o S-shape atinge os dois mínimos.
+% d* = 2w*(trecho a varrer) + L*(m arredondado para cima até par). Dizer quando a prova deixa de valer.
 % Figura sugerida (largura total, 2 colunas):
 % \begin{figure*}[!ht]
 %   \centering
@@ -37,10 +41,10 @@
 % [Visão geral] diagrama do pipeline: dados -> mapeamento -> grafo do pedido -> estratégias -> métricas.
 
 % [Estratégias] tabela em LaTeX (o template proíbe tabela como imagem):
-% carrinho, aleatória, vizinho mais próximo (próximo corredor obrigatório), S-shape, ótimo.
+% carrinho, aleatória, vizinho mais próximo (próximo corredor obrigatório), S-shape (ótimo neste modelo, ver 3.1).
 % Dizer por que retorno e maior lacuna ficaram de fora: dependem da posição do item no corredor.
-% Ótimo: ordem + sentido de travessia de cada corredor obrigatório, ligados por caminhos mínimos
-% (programação dinâmica estilo Held-Karp); custo dobra a cada corredor distinto.
+% Verificação: ótimo exato independente (ordem + sentido de cada corredor obrigatório, caminhos mínimos de
+% Floyd-Warshall, programação dinâmica estilo Held-Karp) confirma nos pedidos reais que S-shape = ótimo.
 
 % [Algoritmo do núcleo] pseudocódigo com o ambiente algorithm (algorithm2e já carregado pela classe):
 % \begin{algorithm}[ht!]
