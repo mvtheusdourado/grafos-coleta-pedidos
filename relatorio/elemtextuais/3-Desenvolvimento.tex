@@ -1,0 +1,59 @@
+% O template chama esta seção de "Desenvolvimento"; as Diretrizes pedem
+% "3. Metodologia" com "3.1 Modelagem" e "3.2 Método de Solução". Seguimos as Diretrizes.
+\section{Metodologia}
+\label{metodologia}
+
+% ORÇAMENTO: até 2 páginas para 3.1 + 3.2 juntas.
+% Escrever PRIMEIRO (é o que trava o código).
+
+\subsection{Modelagem}
+\label{ssec:modelagem}
+
+% [Características do dataset] (exigido explicitamente pelas Diretrizes)
+% Tabelas usadas, tamanho da amostra (ex.: pedidos "train"), categoria "missing",
+% ausência de quantidade, de loja e de layout, order_dow sem mapeamento documentado.
+
+% [Mapeamento categoria -> corredor físico] regra + variações de layout testadas.
+
+% [Modelo 1: grafo da loja] G = (V, E, w) com a notação dos slides da disciplina.
+% V: pontas dos corredores e caixa; E: corredores e trechos de travessa; w: metros.
+% Corredor INDIVISÍVEL (o dataset não dá a posição do produto): corredor com item = aresta obrigatória.
+% Rota mínima = problema do Carteiro Rural (ligação com Euler).
+% Custo da simplificação: superestima a distância quando o item está perto da entrada (vai para limitações).
+% Figura sugerida (largura total, 2 colunas):
+% \begin{figure*}[!ht]
+%   \centering
+%   \includegraphics[width=0.9\textwidth]{figs/grafo-loja.pdf}
+%   \caption{Modelo em grafo da loja ... (o quê, como, onde, quando).}
+%   \label{fig-grafoLoja}
+% \end{figure*}
+
+% [Modelo 2: grafo de coocorrência] vértices = categorias; arestas = Jaccard; por que não contagem bruta.
+% Regra do layout por coocorrência; construído com uma parte dos pedidos e avaliado com outra (evita circularidade).
+
+\subsection{Método de Solução}
+\label{ssec:metodo}
+
+% [Visão geral] diagrama do pipeline: dados -> mapeamento -> grafo do pedido -> estratégias -> métricas.
+
+% [Estratégias] tabela em LaTeX (o template proíbe tabela como imagem):
+% carrinho, aleatória, vizinho mais próximo (próximo corredor obrigatório), S-shape, ótimo.
+% Dizer por que retorno e maior lacuna ficaram de fora: dependem da posição do item no corredor.
+% Ótimo: ordem + sentido de travessia de cada corredor obrigatório, ligados por caminhos mínimos
+% (programação dinâmica estilo Held-Karp); custo dobra a cada corredor distinto.
+
+% [Algoritmo do núcleo] pseudocódigo com o ambiente algorithm (algorithm2e já carregado pela classe):
+% \begin{algorithm}[ht!]
+%   \KwData{...}
+%   ...
+%   \caption{...}
+%   \label{alg-...}
+% \end{algorithm}
+
+% [Desenho experimental] comparação pareada, estratificação pelo nº de corredores distintos, sementes fixas na ordem aleatória,
+% layouts: padrão, variações e coocorrência;
+% divisão de pedidos (construir layout x avaliar), análise de sensibilidade.
+
+% [Métricas e parâmetros] distância, tempo (velocidade, tempo por item), pedidos por turno.
+
+% [Implementação] linguagem, bibliotecas, link do repositório GitHub (obrigatório no relatório).
