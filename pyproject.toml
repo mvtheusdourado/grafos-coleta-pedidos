@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+# Permite que os testes façam "from estrategias import ..." direto de src/.
+pythonpath = ["src"]
+testpaths = ["tests"]
