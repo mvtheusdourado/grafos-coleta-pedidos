@@ -5,7 +5,7 @@
 - Legenda: [bolinha com a cor] [nº do depto] [nome do depto].
 - Última célula (canto inferior direito) = "PARTIDA".
 
-Uso:  python grafo_loja.py   ->  gera grafo_loja.png
+Uso:  python figura_mapa_loja.py   ->  gera grafo_loja.png
 """
 import re
 import textwrap

@@ -1,6 +1,6 @@
 #matriz 9x15, com aisles ids, populada com aisles ids, na ordem no 1º ao último departamento
 
-mapa-loja = [
+mapa_loja = [
     [34, 37, 38, 42, 52, 58, 79, 113, 116, 119, 129, 6, 8, 43, 93],
     [112, 128, 16, 24, 32, 83, 123, 27, 28, 62, 124, 134, 30, 33, 66],
     [76, 26, 31, 64, 77, 90, 94, 98, 115, 40, 41, 4, 9, 12, 63],
