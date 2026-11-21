@@ -1,10 +1,10 @@
 # Coleta Eficiente de Pedidos de Supermercado Online
 
-Projeto da disciplina **SMAC03 – Grafos** (UNIFEI, 2º semestre de 2026), Cenário 5.
+Projeto da disciplina **SMAC03 – Grafos** (UNIFEI, 2º semestre de 2026), referente ao Cenário 5.
 
-O problema estudado é o percurso do funcionário que separa um pedido de supermercado online. Hoje ele percorre os corredores sem critério definido. O projeto modela a loja e os pedidos como **grafos** e mede quanto um roteamento baseado nesses modelos reduz o percurso, usando pedidos reais do dataset *Instacart Market Basket Analysis*.
+O projeto investiga rotas para a coleta de pedidos de supermercado online. Como o dataset *Instacart Market Basket Analysis* não informa uma planta física da loja nem a localização exata dos produtos, o grupo utiliza um layout hipotético modelado por meio de **grafos** e compara diferentes estratégias de visita aos pontos de coleta.
 
-> **Status:** em desenvolvimento. Entrega em 22/11/2026.
+> **Status:** em desenvolvimento. Entrega prevista para 22/11/2026.
 
 ---
 
@@ -12,19 +12,42 @@ O problema estudado é o percurso do funcionário que separa um pedido de superm
 
 | Integrante | Papel |
 |---|---|
-| Matheus Dourado | Coordenador |
-| *Lucas Melo* | Modelador A |
-| *João Pedro Sabino* | Modelador B |
+| *Matheus Dourado* | Coordenador |
+| *Renan Morais* | Modelador A |
+| *Lucas Melo* | Modelador B |
 | *Caio Lene* | Desenvolvedor A |
-| *Renan Stockler* | Desenvolvedor B |
+| *João Pedro Sabino* | Desenvolvedor B |
 
 ---
 
 ## As duas modelagens
 
-**Modelo 1, grafo da loja.** Os vértices são as pontas dos corredores e o caixa. As arestas são os corredores e os trechos das travessas, com peso em metros. Cada produto pertence a um corredor inteiro, então os corredores que têm itens do pedido viram **arestas obrigatórias**, e a melhor rota é um problema do **Carteiro Rural**.
+### Modelo 1 — Grafo da Loja
 
-**Modelo 2, grafo de coocorrência.** Os vértices são as categorias de produtos. As arestas ligam categorias compradas juntas, com peso dado pelo **índice de Jaccard**. Esse grafo é usado para caracterizar os pedidos e para gerar um layout alternativo da loja.
+A loja é representada por um **grafo simples**, **não direcionado** e **não ponderado** $G=(V,E)$, construído como uma grade ortogonal de **9 linhas por 15 colunas**.
+
+Há **135 vértices**: **134 pontos hipotéticos de coleta associados aos 134 aisles (categorias de produtos)** do dataset Instacart e um **vértice adicional ($v_0$), correspondente ao caixa**, na posição (8,14) com indexação iniciada em zero.
+
+Os **aisles são distribuídos sequencialmente na matriz**, da esquerda para a direita e de cima para baixo, agrupados por departamento.
+
+As 246 arestas ligam somente vértices vizinhos na horizontal ou na vertical; atravessar uma aresta equivale a um passo. **Não são considerados obstáculos, diagonais, outras entradas da loja ou distâncias físicas em metros**.
+
+A distância mínima entre dois vértices é a **distância de Manhattan**:
+$$
+d(u,v)=|r_u-r_v|+|c_u-c_v|
+$$
+
+Para cada pedido, os aisles distintos dos produtos solicitados definem o **conjunto de vértices obrigatórios $V_R(P)$**. A rota parte do caixa, visita esses vértices e retorna ao caixa, podendo passar por outros vértices e repetir arestas.
+
+O problema é modelado como uma **instância do Steiner Traveling Salesman Problem (STSP)**. Na grade completa, pode-se calcular a **melhor ordem de visita por meio de um TSP utilizando as distâncias mínimas entre os vértices obrigatórios e o caixa**.
+
+A implementação atual contempla as estratégias **ordem do carrinho, ordem aleatória, vizinho mais próximo e ótimo exato por Held-Karp**. A estratégia exata é limitada, por decisão de implementação, a pedidos de até 15 aisles distintos.
+
+A função de custo considera a saída e o retorno ao caixa.
+
+### Modelo 2 — Grafo de Coocorrência
+
+O Modelo 2 estuda relações de coocorrência entre categorias de produtos e a possibilidade de utilizá-las para construir um layout alternativo.
 
 ---
 
@@ -32,43 +55,46 @@ O problema estudado é o percurso do funcionário que separa um pedido de superm
 
 ```
 grafos-coleta-pedidos/
-├── README.md
-├── requirements.txt         # bibliotecas Python usadas
-├── .gitignore
-│
-├── data/
-│   ├── raw/                 # CSVs originais do Instacart (não versionados)
-│   └── processed/           # amostra limpa, mapeamento categoria → corredor,
-│                            # divisão entre pedidos de construção e de avaliação
-│
-├── src/                     # código-fonte
-│   └── legacy/              # simulação preliminar do modelo antigo (só referência)
-│
-├── tests/                   # testes automáticos
-├── results/                 # CSVs com os resultados dos experimentos
-├── figs/                    # figuras em PDF usadas no relatório e nos slides
-│
-├── relatorio/               # relatório em LaTeX (template da disciplina) e PDF final
-└── slides/                  # apresentação
+├── .github/
+│   └── workflows/
+│       └── testes.yml                 # execução automática dos testes
+├── .gitignore                         # arquivos ignorados pelo Git
+├── README.md                          # apresentação e documentação geral
+├── pyproject.toml                     # configuração do pytest
+├── data/                              # dados utilizados pelo projeto
+│   └── processed/                     # dados processados
+├── src/                               # código-fonte do projeto
+│   ├── estrategias.py                 # estratégias de roteamento
+│   ├── figura_mapa_loja.py            # geração da figura da loja
+│   ├── grafo_loja.py                  # matriz 9 × 15 do supermercado
+│   └── matriz_aisle_departamento.py   # associação entre aisles e departamentos
+├── tests/                             # testes automatizados
+│   └── test_estrategias.py            # testes das estratégias de coleta
+├── results/                           # resultados dos experimentos
+├── figs/                              # figuras utilizadas no relatório
+├── relatorio/                         # relatório acadêmico em LaTeX
+└── slides/                            # apresentação do projeto
 ```
+
+Os arquivos CSV originais do dataset Instacart devem ser armazenados localmente em `data/raw/`, sem versionamento no Git.
 
 | Pasta | Conteúdo | Responsável principal |
 |---|---|---|
-| `data/processed/` | Dados prontos para os experimentos | Modelador B |
-| `src/` | Grafo da loja, estratégias de roteamento, layout por coocorrência, experimentos | Desenvolvedores A e B |
-| `tests/` | Testes de correção (distâncias, S-shape igual ao ótimo etc.) | Desenvolvedor A |
-| `results/` | Números usados no relatório, gerados por código | Desenvolvedor B |
+| `data/processed/` | Dados preparados para os experimentos | Modelador B |
+| `src/` | Grafo da loja, estratégias e experimentos | Desenvolvedores A e B |
+| `tests/` | Testes de distâncias, rotas e algoritmos | Desenvolvedor A |
+| `results/` | Resultados dos experimentos | Desenvolvedor B |
 | `figs/` | Figuras dos modelos e dos resultados | Modeladores e Desenvolvedor B |
-| `relatorio/` | Fonte LaTeX e PDF entregue | Coordenador |
+| `relatorio/` | Relatório em LaTeX | Coordenador |
 | `slides/` | Apresentação | Coordenador |
 
-Os números do relatório saem de `results/`, e as figuras saem de `figs/`. Nada é digitado à mão.
+As pastas `results/` e `figs/` são destinadas, respectivamente, aos resultados dos experimentos e às figuras utilizadas no relatório e na apresentação.
 
 ---
 
 ## Como obter os dados
 
-O dataset original **não está no repositório** porque os arquivos passam do limite de tamanho do GitHub.
+O dataset original **não está versionado neste repositório** devido ao volume dos arquivos e à decisão de manter os dados brutos fora do controle de versão.
 
 1. Acesse https://www.kaggle.com/datasets/psparks/instacart-market-basket-analysis (é preciso uma conta gratuita no Kaggle).
 2. Baixe e coloque em `data/raw/`:
@@ -84,32 +110,38 @@ O arquivo `order_products__prior.csv` não é necessário: o projeto usa os pedi
 
 ## Como executar
 
-> *A preencher pelo Desenvolvedor A quando o código estiver pronto.*
+O projeto utiliza Python. Para executar os testes automatizados, utilize os seguintes comandos na raiz do repositório:
 
 ```bash
-pip install -r requirements.txt
-
-# 1. preparar os dados (gera data/processed/)
-# 2. rodar os experimentos (gera results/)
-# 3. gerar as figuras (gera figs/)
-# 4. rodar os testes
+python -m pip install pytest
+python -m pytest -v
 ```
+
+Para gerar a figura do grafo da loja:
+
+```bash
+python -m pip install matplotlib
+python src/figura_mapa_loja.py
+```
+
+A figura gerada é salva como `grafo_loja.png` no diretório de execução.
+
+A execução completa dos experimentos com pedidos reais depende da integração dos scripts de processamento dos dados e de geração dos resultados.
 
 ---
 
 ## Fluxo de trabalho do grupo
 
-- O texto do relatório é escrito num **Google Docs compartilhado**, uma seção por pessoa. Só o coordenador passa o texto para o LaTeX em `relatorio/`.
-- No Git:
-  - rodar `git pull` antes de começar;
-  - fazer commits pequenos, com mensagens claras;
-  - **duas pessoas não editam o mesmo arquivo ao mesmo tempo**.
-- Os dados originais ficam só em `data/raw/` na máquina de cada um. Nenhum arquivo acima de 100 MB vai para o repositório.
+- O rascunho colaborativo do relatório é escrito no Google Docs. Cada integrante escreve a sua parte, e após ser finalizado e revisado, o coordenador transfere o texto aprovado para `relatorio/` em LaTeX.
+- Para alterações no GitHub, cada integrante utiliza uma branch específica, realiza os commits necessários e abre um Pull Request para o coordenador revisar antes de integrar à main.
+- São evitadas edições simultâneas em arquivos sob responsabilidade de outros integrantes.
+- Os CSVs originais do dataset Instacart permanecem em `data/raw/` na máquina de cada integrante, sem inclusão no repositório.
 
 ---
 
 ## Entregáveis
 
-- Relatório em PDF: `relatorio/`
-- Slides: `slides/`
+- Relatório final em PDF: `relatorio/`
+- Apresentação em slides: `slides/`
 - Código-fonte: `src/` e `tests/`
+- Figuras e resultados experimentais: `figs/` e `results/`
