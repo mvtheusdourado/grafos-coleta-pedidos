@@ -1,0 +1,31 @@
+{
+  "pedidos_total": 131209,
+  "pedidos_treino": 104967,
+  "pedidos_teste": 26242,
+  "semente": 2026,
+  "suporte_minimo": 5,
+  "arestas_coocorrencia": 8466,
+  "otimizacao": {
+    "objetivo_inicial": 1681.9187855590064,
+    "objetivo_final": 1318.5209538156314,
+    "trocas": 30
+  },
+  "avaliacao": {
+    "carrinho": {
+      "media_layout_original_passos": 74.39135736605442,
+      "media_layout_coocorrencia_passos": 53.2745979727155,
+      "reducao_percentual": 28.386038568204334,
+      "pedidos_modelo2_melhor": 21932,
+      "pedidos_empatados": 2472,
+      "pedidos_modelo2_pior": 1838
+    },
+    "vizinho_mais_proximo": {
+      "media_layout_original_passos": 43.858699794223,
+      "media_layout_coocorrencia_passos": 36.08581662983004,
+      "reducao_percentual": 17.722557214103254,
+      "pedidos_modelo2_melhor": 19153,
+      "pedidos_empatados": 3507,
+      "pedidos_modelo2_pior": 3582
+    }
+  }
+}

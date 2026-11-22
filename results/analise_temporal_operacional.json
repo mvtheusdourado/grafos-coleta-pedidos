@@ -1,0 +1,95 @@
+{
+  "escopo": "Somente pedidos de order_products__train.csv (não todo orders.csv)",
+  "periodo": "Dia e hora da realização dos pedidos, não da coleta",
+  "pedidos_analisados": 131209,
+  "pedidos_teste_operacional": 26242,
+  "media_itens_por_pedido_todos": 10.5528,
+  "media_aisles_distintos_todos": 7.5511,
+  "media_itens_por_pedido_teste": 10.5283,
+  "media_aisles_distintos_teste": 7.5338,
+  "pedidos_por_dia_codigo_0_a_6": {
+    "0": 27465,
+    "1": 19672,
+    "2": 16119,
+    "3": 15687,
+    "4": 15959,
+    "5": 17406,
+    "6": 18901
+  },
+  "pedidos_por_hora_0_a_23": {
+    "0": 852,
+    "1": 507,
+    "2": 305,
+    "3": 223,
+    "4": 218,
+    "5": 402,
+    "6": 1121,
+    "7": 3376,
+    "8": 6343,
+    "9": 9033,
+    "10": 10585,
+    "11": 10610,
+    "12": 10622,
+    "13": 10711,
+    "14": 11103,
+    "15": 11075,
+    "16": 10495,
+    "17": 9353,
+    "18": 7558,
+    "19": 5721,
+    "20": 3978,
+    "21": 3050,
+    "22": 2442,
+    "23": 1526
+  },
+  "hipoteses_operacionais_nao_observadas": {
+    "metros_por_passo_de_grade": 1.5,
+    "velocidade_metros_por_segundo": 1.2,
+    "segundos_por_item": 20.0,
+    "segundos_fixos_por_pedido": 120.0,
+    "horas_efetivas_por_turno": 7.0,
+    "funcionarios": 1
+  },
+  "estimativas_por_estrategia_e_layout": {
+    "carrinho": {
+      "layout_original": {
+        "distancia_media_passos": 74.3914,
+        "deslocamento_estimado_segundos": 92.99,
+        "separacao_estimada_segundos": 210.57,
+        "tempo_total_estimado_minutos": 7.059,
+        "pedidos_por_turno_estimados": 59
+      },
+      "layout_coocorrencia": {
+        "distancia_media_passos": 53.2746,
+        "deslocamento_estimado_segundos": 66.59,
+        "separacao_estimada_segundos": 210.57,
+        "tempo_total_estimado_minutos": 6.619,
+        "pedidos_por_turno_estimados": 63
+      }
+    },
+    "vizinho_mais_proximo": {
+      "layout_original": {
+        "distancia_media_passos": 43.8587,
+        "deslocamento_estimado_segundos": 54.82,
+        "separacao_estimada_segundos": 210.57,
+        "tempo_total_estimado_minutos": 6.423,
+        "pedidos_por_turno_estimados": 65
+      },
+      "layout_coocorrencia": {
+        "distancia_media_passos": 36.0858,
+        "deslocamento_estimado_segundos": 45.11,
+        "separacao_estimada_segundos": 210.57,
+        "tempo_total_estimado_minutos": 6.261,
+        "pedidos_por_turno_estimados": 67
+      }
+    }
+  },
+  "limitacoes": [
+    "A hora do pedido não informa a hora da coleta física.",
+    "A grade 9x15 é hipotética; metros por passo são premissa, não medida.",
+    "Velocidade, tempo por item, preparo e horas efetivas são premissas ilustrativas.",
+    "Capacidade é idealizada por funcionário, sem variabilidade, congestionamento ou demanda.",
+    "As métricas operacionais usam as mesmas distâncias médias do conjunto de teste do Modelo 2.",
+    "A capacidade por turno é estimativa e não resultado observado na operação Instacart."
+  ]
+}
