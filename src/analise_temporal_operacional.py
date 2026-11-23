@@ -136,10 +136,11 @@ def gerar_figura(grade, dias, horas, total):
              "Horário de compra não equivale ao de coleta. "
              "Códigos 0–6 sem atribuir nomes de dias.",
              fontsize=8, color="#455468")
-    for extensao in ("png", "svg"):
-        fig.savefig(FIGURAS / f"padroes_temporais.{extensao}", dpi=190, bbox_inches="tight")
+    fig.savefig(
+        FIGURAS / "padroes_temporais.png",
+        dpi=190,
+        bbox_inches="tight")
     plt.close(fig)
-
 
 def main():
     for nome in ("products.csv", "order_products__train.csv", "orders.csv"):
@@ -211,9 +212,8 @@ def main():
             print(f"  {variante}: {valores['tempo_total_estimado_minutos']:.2f} min/pedido; "
                   f"{valores['pedidos_por_turno_estimados']} pedidos/turno (estimados)")
     print("\nArquivo: results/analise_temporal_operacional.json")
-    print("Figuras: figs/padroes_temporais.png e figs/padroes_temporais.svg")
+    print("Figuras: figs/padroes_temporais.png")
     print("AVISO: tempo e capacidade são estimativas sob hipóteses, não observações reais.")
-
 
 if __name__ == "__main__":
     main()

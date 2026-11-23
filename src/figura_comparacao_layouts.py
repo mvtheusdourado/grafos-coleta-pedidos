@@ -1,10 +1,5 @@
-"""Figura científica dos layouts do Cenário 5 (SMAC03 - Grafos).
+"""Figura científica dos layouts."""
 
-Saídas esperadas:
-    figs/comparacao_layouts.png
-    figs/comparacao_layouts.svg
-
-"""
 from __future__ import annotations
 
 import json
@@ -137,17 +132,16 @@ def main() -> None:
              "Distâncias em passos de grade (Manhattan). Modelo de loja hipotético, não planta física real.",
              ha="left", fontsize=9, color=SECUNDARIA)
 
+
     pasta_saida = RAIZ / "figs"
     pasta_saida.mkdir(parents=True, exist_ok=True)
-    png = pasta_saida / "comparacao_layouts.png"
-    svg = pasta_saida / "comparacao_layouts.svg"
-    fig.savefig(png, dpi=220, facecolor=FUNDO)
-    fig.savefig(svg, facecolor=FUNDO)
-    plt.close(fig)
-    print(f"Figura PNG: {png}")
-    print(f"Figura SVG: {svg}")
-    print(f"Posições alteradas: {alteradas} de 134; caixa fixo.")
 
+    png = pasta_saida / "comparacao_layouts.png"
+    fig.savefig(png, dpi=220, facecolor=FUNDO)
+    plt.close(fig)
+
+    print(f"Figura PNG: {png}")
+    print(f"Posições alteradas: {alteradas} de 134; caixa fixo.")
 
 if __name__ == "__main__":
     main()
