@@ -144,7 +144,7 @@ grafos-coleta-pedidos/
 Os arquivos CSV originais do dataset Instacart são armazenados localmente em `data/raw/`, sem versionamento no Git.
 
 | Pasta | Conteúdo |
-|---|---|---|
+|---|---|
 | `data/processed/` | Dados preparados para os experimentos |
 | `src/` | Grafo da loja e de coocorrência, estratégias e experimentos |
 | `tests/` | Testes de distâncias, rotas e algoritmos |
