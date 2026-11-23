@@ -1,25 +1,20 @@
 \section{Referencial Teórico}
 \label{referencial}
 
-% ORÇAMENTO: até 1 página. Template: conceitos com referência (de preferência mais de uma)
-% + trabalhos correlatos, mostrando como as ideias evoluíram até o estado da arte.
-% Citações em formato autor-ano (natbib): \citet{chave} -> Autor (ano); \citep{chave} -> (Autor, ano).
-% Só citar o que alguém do grupo efetivamente leu. Conferir cada .bib (Google Acadêmico vem incompleto).
-
 \subsection{Conceitos Fundamentais}
 \label{ssec:conceitos}
-% Só o que será usado depois, 1-2 frases cada:
-% - grafo ponderado; caminho mínimo (Floyd-Warshall)
-% - CENTRAL: problema dos carteiros. Carteiro Chinês (todas as arestas) e Carteiro Rural (só as obrigatórias);
-%   grafo euleriano (grau par + conexidade) e por que arestas são repetidas
-% - diferença para o caixeiro viajante (TSP): visitar vértices x cobrir arestas
-% - algoritmo exato x heurística; aproximação (MST dobrada), se usada
-% - coocorrência e medida normalizada (Jaccard)
+
+O problema de roteamento de pedidos em ambientes de varejo, conhecido na literatura como \textit{order picking}, consiste em determinar a sequência de deslocamento de menor custo para coletar um conjunto específico de itens distribuídos em um supermercado \citep{dekoster2007}. Na Teoria dos Grafos e na Pesquisa Operacional, a estrutura navegável de um supermercado pode ser formalmente representada por meio de um grafo simples, não direcionado e não ponderado $G = (V, E)$ \citep{bondy2008}.
+
+A otimização de rotas sobre essa estrutura enquadra-se na família do Problema do Caixeiro Viajante (TSP) e, mais especificamente, em sua generalização sobre grafos, o \textit{Steiner Traveling Salesman Problem} (STSP). Enquanto o TSP clássico busca uma rota de menor custo que visite todos os vértices considerados e retorne à origem, o STSP busca um percurso fechado de custo mínimo que parta do caixa, visite ao menos uma vez cada vértice do subconjunto de vértices obrigatórios $V_R$, formado pelos vértices associados aos \textit{aisles} dos produtos solicitados, e retorne à origem. Os demais vértices podem ser utilizados como pontos de passagem ou ignorados, sendo permitida a repetição de vértices e arestas durante o percurso \citep{rodriguezpereira2019}.
+
+Em uma grade ortogonal sem obstáculos, a distância mínima entre dois vértices pode ser calculada pela métrica de Manhattan, $d(u,v) = |r_u - r_v| + |c_u - c_v|$, em que $r$ e $c$ representam as coordenadas de linha e coluna. Essa distância corresponde ao número mínimo de passos horizontais e verticais, permitindo avaliar diferentes sequências de visita aos pontos obrigatórios.
 
 \subsection{Trabalhos Correlatos}
 \label{ssec:correlatos}
-% Linha do tempo das ideias (ontogenia):
-% Ratliff e Rosenthal (1983) -> Hall (1993) / Petersen (1997), heurísticas
-% -> Roodbergen e de Koster (2001), várias travessas -> De Koster et al. (2007), revisão
-% -> alocação de produtos correlacionados ("correlated storage assignment")
-% Fechar dizendo onde ESTE trabalho se posiciona.
+
+A literatura sobre coleta de pedidos abrange decisões de layout, alocação de produtos, agrupamento de pedidos e roteamento \citep{dekoster2007}. No roteamento, \citet{ratliff1983} mostraram que, em armazéns retangulares com corredores paralelos, a rota ótima pode ser obtida em tempo polinomial por programação dinâmica, explorando a necessidade de percorrer os corredores que contêm itens, formulação próxima dos problemas de cobertura de arestas. Quando os pontos a visitar formam um subconjunto dos vértices de um grafo, o problema corresponde ao Steiner TSP, cujas variantes e métodos de solução são revisados por \citet{rodriguezpereira2019}.
+
+Para o TSP, a programação dinâmica proposta independentemente por \citet{bellman1962} e por \citet{heldkarp1962} obtém a solução exata em tempo $O(n^2 \cdot 2^n)$, viável apenas para poucos vértices. Entre as heurísticas construtivas, o vizinho mais próximo foi analisado por \citet{rosenkrantz1977}, que mostraram que, em instâncias métricas, sua razão em relação ao ótimo é limitada por um fator que cresce logaritmicamente com o número de vértices. \citet{hougardy2015} mostraram que esse crescimento pode de fato ocorrer, inclusive com distâncias retilíneas, como a de Manhattan. Em contrapartida, avaliações experimentais como a de \citet{johnson1997} indicam que, em instâncias típicas, a heurística produz rotas razoavelmente próximas do ótimo.
+
+Este trabalho combina essas linhas: utiliza pedidos reais do Instacart, adota um layout em grade no qual o roteamento é tratado como STSP, compara o vizinho mais próximo com a solução exata de Held-Karp e investiga, por meio de um grafo de coocorrência, o efeito da organização das categorias sobre o percurso.

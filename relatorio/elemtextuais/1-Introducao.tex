@@ -1,34 +1,28 @@
 \section{Introdução}
 \label{introducao}
 
-% ORÇAMENTO: até 1 página (meta: ~0,9, porque o cabeçalho da primeira página já ocupa espaço).
-% Cada bloco abaixo = 1 ou 2 parágrafos (Diretrizes, "Dicas para a estrutura da Introdução").
-% Escrever POR ÚLTIMO, depois de Metodologia e Resultados.
+As compras de supermercado pela internet tornaram-se uma opção recorrente para as famílias. Nesse modelo, cada pedido precisa ser fisicamente coletado na loja por um funcionário, que percorre os corredores reunindo os itens antes da embalagem e do despacho. Essa etapa, conhecida como coleta de pedidos (\textit{order picking}), é apontada pela literatura como uma das atividades mais custosas e intensivas em mão de obra nas operações de armazenagem e distribuição \citep{dekoster2007}.
 
-% [Contextualização: macro -> meso]
-% Compras de supermercado online; a coleta de pedidos como etapa de maior custo e tempo.
-% Citar fonte para cada afirmação de mercado/custo (nada sem referência).
+Na prática, a coleta costuma ocorrer sem um critério definido para a ordem de visita aos itens: o funcionário segue a lista recebida ou improvisa o trajeto, podendo retornar a regiões já percorridas. Multiplicado pelos pedidos de um turno, esse deslocamento adicional reduz a capacidade de atendimento e aumenta o tempo até a entrega.
 
-% [Delimitação do tema: meso -> micro]
-% Um separador, um pedido por vez, loja de corredores paralelos;
-% dados do Instacart (detalhes do dataset ficam para a Seção 3.1).
+Este trabalho delimita-se à coleta de um pedido por vez, por um único funcionário, em um supermercado hipotético. São utilizados pedidos reais do conjunto \textit{Instacart Market Basket Analysis} \citep{instacart2017}, que informa a categoria (\textit{aisle}) de cada produto, mas não a planta física da loja nem a posição dos produtos. Por isso, a loja é modelada como uma grade de pontos de coleta, um por categoria.
 
-% [Problema, formulado como PERGUNTA]
+O problema investigado pode ser formulado na seguinte pergunta: em que medida a modelagem da loja e dos pedidos como grafos permite definir rotas de coleta mais curtas que a coleta sem critério, e qual é o efeito da organização espacial das categorias sobre essas rotas? Como o Instacart é voltado à análise do comportamento de compra e não inclui informações espaciais, aplicá-lo ao roteamento exige construir uma representação da loja e conectá-la aos pedidos, o que constitui parte da contribuição deste trabalho.
 
-% [Lacuna de pesquisa]
-% Ex.: o dataset é amplamente usado para recomendação/cesta, mas não traz layout;
-% conectar pedidos reais a modelos de roteamento exige construir esse elo.
-% CONFIRMAR na revisão antes de afirmar.
+A investigação é orientada por quatro questões de pesquisa:
 
-% [Questões de pesquisa e hipóteses]  -> manter a mesma numeração na Seção 4
-% Q1/H1: redução de distância frente à coleta sem critério
-% Q2/H2: variação do ganho com o nº de corredores que o pedido obriga a cobrir
-% Q3/H3: efeito da geometria da loja (nº e comprimento de corredores) sobre o ganho
-% Q4/H4: layout guiado por coocorrência
-% Apresentar as duas modelagens em 1 frase cada: grafo da loja (roteamento) e grafo de coocorrência (padrões e layout).
+\noindent\textbf{Q1:} Em que medida estratégias de ordenação da coleta reduzem a distância percorrida em relação à ordem em que os itens foram adicionados ao carrinho?
 
-% [Justificativa científica e prática]
+\noindent\textbf{Q2:} Como o número de pontos de coleta obrigatórios de um pedido influencia essa redução?
 
-% [Objetivo geral + objetivos teóricos e práticos]
+\noindent\textbf{Q3:} Uma reorganização das categorias orientada pela coocorrência nos pedidos reduz a distância percorrida?
 
-% [Estrutura do documento: 1 frase]
+\noindent\textbf{Q4:} Qual é o impacto estimado dessas reduções sobre o tempo de coleta e o número de pedidos atendidos por turno?
+
+Com base na literatura, espera-se que estratégias que consideram as distâncias no grafo reduzam o percurso, já que heurísticas construtivas tendem a produzir rotas próximas do ótimo em instâncias típicas \citep{johnson1997} (H1); que essa redução cresça com o número de pontos de coleta, pois mais pontos admitem mais ordens de visita (H2); que a aproximação de categorias compradas em conjunto diminua as distâncias médias, dado o papel da alocação de produtos no desempenho da coleta \citep{dekoster2007} (H3); e que o ganho em tempo seja proporcionalmente menor que o ganho em distância, pois parte do tempo de coleta independe do trajeto (H4).
+
+Do ponto de vista científico, o trabalho aplica conceitos de Teoria dos Grafos, como distâncias mínimas, o Problema do Caixeiro Viajante de Steiner e grafos ponderados de coocorrência, a dados reais de pedidos, comparando heurísticas com a solução ótima exata. Do ponto de vista prático, avalia se uma regra simples de ordenação e uma reorganização das categorias podem aumentar a capacidade de atendimento sem investimentos em infraestrutura.
+
+O objetivo geral é propor e avaliar uma solução computacional que, a partir de um pedido real, defina a rota de coleta e estime sua eficiência. Como objetivos teóricos, busca-se modelar formalmente a loja e os pedidos como grafos e caracterizar o problema de roteamento resultante. Como objetivos práticos, busca-se implementar e comparar estratégias de coleta, avaliar um layout orientado por coocorrência e estimar seus efeitos operacionais.
+
+A Seção~\ref{referencial} apresenta os conceitos fundamentais e os trabalhos correlatos; a Seção~\ref{metodologia} descreve a modelagem e o método de solução; a Seção~\ref{resultados} apresenta e discute os resultados; e a Seção~\ref{conclusoes} apresenta as conclusões.

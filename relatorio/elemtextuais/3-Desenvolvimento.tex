@@ -1,63 +1,95 @@
-% O template chama esta seção de "Desenvolvimento"; as Diretrizes pedem
-% "3. Metodologia" com "3.1 Modelagem" e "3.2 Método de Solução". Seguimos as Diretrizes.
 \section{Metodologia}
 \label{metodologia}
-
-% ORÇAMENTO: até 2 páginas para 3.1 + 3.2 juntas.
-% Escrever PRIMEIRO (é o que trava o código).
 
 \subsection{Modelagem}
 \label{ssec:modelagem}
 
-% [Características do dataset] (exigido explicitamente pelas Diretrizes)
-% Tabelas usadas, tamanho da amostra (ex.: pedidos "train"), categoria "missing",
-% ausência de quantidade, de loja e de layout, order_dow sem mapeamento documentado.
+Todos os dados utilizados foram obtidos dos arquivos \texttt{products.csv}, \texttt{order\_\allowbreak products\_\_\allowbreak train.csv} e \texttt{orders.csv} do Instacart. O primeiro associa os produtos aos seus \textit{aisles}, o segundo identifica os itens de cada pedido e sua ordem de inclusão no carrinho, e o terceiro fornece os registros temporais das compras.
 
-% [Mapeamento categoria -> corredor físico] regra + variações de layout testadas.
+O recorte \textit{train} contém 131.209 pedidos, com média de 10,55 itens e 7,55 \textit{aisles} distintos por pedido. O conjunto não informa quantidades, posições dos produtos nem a planta da loja; a categoria \textit{missing} foi mantida como um ponto de coleta.
 
-% [Modelo 1: grafo da loja] G = (V, E, w) com a notação dos slides da disciplina.
-% V: pontas dos corredores e caixa; E: corredores e trechos de travessa; w: metros.
-% Corredor INDIVISÍVEL (o dataset não dá a posição do produto): corredor com item = aresta obrigatória.
-% Rota mínima = problema do Carteiro Rural (ligação com Euler).
-% Custo da simplificação: superestima a distância quando o item está perto da entrada (vai para limitações).
-% [Resultado central] Proposição: com corredor inteiro, um bloco e caixa na travessa da frente, o S-shape é ótimo.
-% Prova: nº de travessias de corredor é par (começa e termina na frente) e >= m -> >= m arredondado p/ cima até par;
-% nas travessas é preciso ir do caixa ao corredor obrigatório mais distante e voltar; o S-shape atinge os dois mínimos.
-% d* = 2w*(trecho a varrer) + L*(m arredondado para cima até par). Dizer quando a prova deixa de valer.
-% Figura sugerida (largura total, 2 colunas):
-% \begin{figure*}[!ht]
-%   \centering
-%   \includegraphics[width=0.9\textwidth]{figs/grafo-loja.pdf}
-%   \caption{Modelo em grafo da loja ... (o quê, como, onde, quando).}
-%   \label{fig-grafoLoja}
-% \end{figure*}
+\subsubsection*{Modelo 1 -- Grafo da Loja}
 
-% [Modelo 2: grafo de coocorrência] vértices = categorias; arestas = Jaccard; por que não contagem bruta.
-% Regra do layout por coocorrência; construído com uma parte dos pedidos e avaliado com outra (evita circularidade).
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=0.86\textwidth]{figs/grafo_loja.png}
+\caption{Representação do grafo da loja hipotética utilizado nos experimentos de roteirização, modelado como uma grade $9 \times 15$, com 134 vértices correspondentes aos \textit{aisles} e um vértice para o caixa, conectados por arestas entre posições ortogonalmente adjacentes.}
+\label{fig:grafo_loja}
+\end{figure*}
+
+A Figura~\ref{fig:grafo_loja} ilustra o layout hipotético do supermercado, representado por uma grade bidimensional de $9 \times 15$ posições, totalizando 135 vértices. Nessa estrutura, cada \textit{aisle} do dataset, correspondente a uma categoria de produtos, é representado por um vértice do grafo $G_1 = (V_1, E_1)$, associado a um ponto hipotético de coleta. O conjunto de dados abrange 134 \textit{aisles} distintos \citep{instacart2017}. No modelo, eles são distribuídos sequencialmente na matriz, linha por linha, da esquerda para a direita, agrupados por departamento. A última posição da matriz, situada no canto inferior direito, corresponde ao vértice base $v_0$, que representa o caixa onde todas as rotas começam e terminam. Considerando a indexação a partir de zero, suas coordenadas são $(8, 14)$.
+
+O conjunto de arestas $E_1$ conecta cada vértice aos seus vizinhos imediatos nas direções horizontal e vertical, totalizando 246 arestas. Como o grafo é simples, não direcionado e não ponderado, cada aresta percorrida corresponde a um passo, independentemente do sentido do deslocamento. Dessa forma, as distâncias mínimas entre os vértices são calculadas pela métrica de Manhattan, conforme apresentada na Seção~\ref{ssec:conceitos}, considerando uma grade sem obstáculos ou restrições adicionais de circulação.
+
+Para cada pedido $P$, identifica-se o conjunto de vértices obrigatórios $V_R(P) \subseteq V_1 \setminus \{v_0\}$, correspondente aos \textit{aisles} distintos dos produtos solicitados. Como a distância de Manhattan entre dois vértices pode ser calculada em tempo constante, o problema de roteamento concentra-se na escolha da ordem de visita aos vértices obrigatórios. As estratégias apresentadas na Seção~\ref{ssec:metodo} determinam essa ordem, considerando a saída e o retorno ao caixa $v_0$. O comprimento total da rota corresponde à soma das distâncias mínimas entre as paradas consecutivas, incluindo os deslocamentos inicial e final entre o caixa e os pontos de coleta.
+
+\subsubsection*{Modelo 2 -- Grafo de Coocorrência}
+
+O segundo modelo utiliza um grafo não direcionado e ponderado $G_2 = (V_2, E_2)$, com 134 vértices correspondentes aos \textit{aisles}. Diferentemente do Modelo 1, suas arestas representam associações entre categorias presentes nos mesmos pedidos, e não conexões físicas da loja. Os pesos são definidos pela similaridade de Jaccard:
+\begin{equation}
+J(a,b) = \frac{c(a,b)}{f(a) + f(b) - c(a,b)},
+\label{eq:jaccard}
+\end{equation}
+em que $c(a,b)$ representa o número de pedidos contendo ambos os \textit{aisles}, enquanto $f(a)$ e $f(b)$ correspondem às frequências individuais. São consideradas apenas associações com suporte mínimo de cinco pedidos.
+
+Esses pesos orientam a reorganização dos \textit{aisles}, buscando aproximar categorias frequentemente adquiridas em conjunto. A geometria da grade $9 \times 15$ e a posição do caixa são preservadas, enquanto a disposição das categorias é modificada. Como o Instacart não fornece a planta física da loja, a representação espacial permanece hipotética.
 
 \subsection{Método de Solução}
 \label{ssec:metodo}
 
-% [Visão geral] diagrama do pipeline: dados -> mapeamento -> grafo do pedido -> estratégias -> métricas.
+\subsubsection*{Modelo 1 -- Estratégias de Roteamento}
 
-% [Estratégias] tabela em LaTeX (o template proíbe tabela como imagem):
-% carrinho, aleatória, vizinho mais próximo (próximo corredor obrigatório), S-shape (ótimo neste modelo, ver 3.1).
-% Dizer por que retorno e maior lacuna ficaram de fora: dependem da posição do item no corredor.
-% Verificação: ótimo exato independente (ordem + sentido de cada corredor obrigatório, caminhos mínimos de
-% Floyd-Warshall, programação dinâmica estilo Held-Karp) confirma nos pedidos reais que S-shape = ótimo.
+Cada pedido é convertido em uma sequência de \textit{aisles} distintos, respeitando a primeira ocorrência em \texttt{add\_\allowbreak to\_\allowbreak cart\_\allowbreak order}. Todas as rotas partem do caixa e retornam a ele, e seu custo corresponde à soma das distâncias de Manhattan entre paradas consecutivas. As estratégias diferem na ordem de visita aos pontos obrigatórios.
 
-% [Algoritmo do núcleo] pseudocódigo com o ambiente algorithm (algorithm2e já carregado pela classe):
-% \begin{algorithm}[ht!]
-%   \KwData{...}
-%   ...
-%   \caption{...}
-%   \label{alg-...}
-% \end{algorithm}
+Foram implementadas quatro estratégias: ordem do carrinho, que segue a sequência de inclusão dos produtos; ordem aleatória, que utiliza permutações com sementes determinísticas e calcula a distância média dos sorteios; vizinho mais próximo, que seleciona iterativamente o \textit{aisle} pendente de menor distância, desempatando pelo menor identificador \citep{rosenkrantz1977} (Algoritmo~\ref{alg:vizinho}); e rota ótima, calculada por programação dinâmica de Held-Karp \citep{heldkarp1962} (Algoritmo~\ref{alg:heldkarp}).
 
-% [Desenho experimental] comparação pareada, estratificação pelo nº de corredores distintos, sementes fixas na ordem aleatória,
-% layouts: padrão, variações e coocorrência;
-% divisão de pedidos (construir layout x avaliar), análise de sensibilidade.
+\SetKwInput{Entrada}{Entrada}
+\SetKwInput{Saida}{Saída}
+\SetKwFor{Enquanto}{enquanto}{faça}{fim}
+\SetKwFor{ParaCada}{para cada}{faça}{fim}
+\SetKw{Retorna}{retorna}
 
-% [Métricas e parâmetros] distância, tempo (velocidade, tempo por item), pedidos por turno.
+\begin{algorithm}[!ht]
+\small
+\Entrada{conjunto $V_R$ de \textit{aisles} do pedido; caixa $v_0$}
+\Saida{sequência de visita aos \textit{aisles}}
+$atual \leftarrow v_0$; $rota \leftarrow [\,]$\;
+\Enquanto{houver \textit{aisles} pendentes}{
+  escolher o pendente mais próximo de $atual$ (empate: menor identificador)\;
+  acrescentá-lo a $rota$; $atual \leftarrow$ esse \textit{aisle}\;
+}
+\Retorna{$rota$ (o custo inclui a saída e o retorno ao caixa $v_0$)}
+\caption{Vizinho mais próximo}
+\label{alg:vizinho}
+\end{algorithm}
 
-% [Implementação] linguagem, bibliotecas, link do repositório GitHub (obrigatório no relatório).
+\begin{algorithm}[!ht]
+\small
+\Entrada{conjunto $V_R$ de \textit{aisles} do pedido; caixa $v_0$; distâncias $d$}
+\Saida{custo e rota ótimos}
+\ParaCada{$j \in V_R$}{$C[\{j\}][j] \leftarrow d(v_0, j)$\;}
+\ParaCada{subconjunto $S \subseteq V_R$, em ordem crescente, e cada $j \in S$}{
+  $C[S][j] \leftarrow \min_{i \in S \setminus \{j\}} \big(C[S \setminus \{j\}][i] + d(i,j)\big)$\;
+}
+$custo \leftarrow \min_{j \in V_R} \big(C[V_R][j] + d(j, v_0)\big)$\;
+remontar a rota pelos predecessores\;
+\caption{Rota ótima (Held-Karp)}
+\label{alg:heldkarp}
+\end{algorithm}
+
+Nessa formulação, $C[S][j]$ representa o menor custo para sair do caixa, visitar os vértices de $S$ e terminar em $j$. Os subconjuntos são armazenados por máscaras de bits. Devido à complexidade temporal $O(n^2 \cdot 2^n)$, a solução exata é limitada a pedidos com até 15 \textit{aisles} distintos, enquanto as demais estratégias podem processar pedidos maiores.
+
+\subsubsection*{Modelo 2 -- Otimização do Layout por Coocorrência}
+
+Para construir o segundo modelo, os 131.209 pedidos do conjunto \textit{train} foram divididos em 104.967 pedidos de treinamento (80\%) e 26.242 de teste (20\%), utilizando a semente 2026. O grafo de coocorrência foi construído exclusivamente com os pedidos de treinamento, aplicando os pesos de Jaccard da Equação~\ref{eq:jaccard}.
+
+A reorganização utiliza uma busca local determinística, cuja função objetivo minimiza a soma das distâncias de Manhattan entre pares de \textit{aisles}, ponderadas por suas similaridades de Jaccard:
+\begin{equation}
+F(L) = \sum_{(a,b) \in E_2} J(a,b)\, d_L(a,b),
+\label{eq:objetivo}
+\end{equation}
+em que $d_L(a,b)$ representa a distância de Manhattan entre as posições dos \textit{aisles} $a$ e $b$ no layout $L$. Em cada iteração, são avaliadas as possíveis trocas de posição entre pares de \textit{aisles}, selecionando aquela que proporciona a maior redução da função objetivo. O procedimento termina quando não há melhoria ou após 30 trocas, mantendo a posição do caixa fixa.
+
+Para avaliar o layout reorganizado, as estratégias de ordem do carrinho e vizinho mais próximo são executadas novamente sobre os mesmos 26.242 pedidos de teste, tanto no layout original quanto no otimizado. As distâncias médias permitem comparar o efeito da reorganização sem utilizar os pedidos de teste na construção do grafo.
+
+A implementação foi validada por 67 testes automatizados (\textit{pytest}), executados a cada alteração do repositório por integração contínua (GitHub Actions). Os testes verificam o cálculo de distâncias e custos em exemplos resolvidos manualmente, a igualdade entre o Held-Karp e a busca exaustiva em 35 pedidos sorteados com 1 a 7 \textit{aisles}, a ausência de rotas heurísticas com custo inferior ao ótimo, o cálculo do Jaccard por pedido e a separação entre pedidos de treinamento e de teste. O código, os dados processados, os resultados e as figuras estão disponíveis em \url{https://github.com/mvtheusdourado/grafos-coleta-pedidos}.
